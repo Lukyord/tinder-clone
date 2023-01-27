@@ -3,11 +3,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen/HomeScreen";
 import ChatScreen from "./screens/ChatScreen/ChatScreen";
 import LoginScreen from "./screens/LoginScreen/LoginScreen";
+import useAuth from "./hooks/useAuth";
 
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
-  const user = true;
+  const { user } = useAuth();
 
   return (
     <Stack.Navigator>

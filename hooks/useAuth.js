@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  if (initializing) return user;
+  if (initializing) return null;
 
   return (
     <AuthContext.Provider

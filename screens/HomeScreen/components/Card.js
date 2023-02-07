@@ -1,9 +1,11 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useRef } from "react";
+import React from "react";
 import Swiper from "react-native-deck-swiper";
 import { DUMMY_DATA } from "../dummy_data";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
-export default function Card({ swipeRef, profile }) {
+export default function Card({ swipeRef, profiles, swipeLeft, swipeRight }) {
   return (
     <>
       <View className="flex-1 -mt-10">
@@ -12,13 +14,13 @@ export default function Card({ swipeRef, profile }) {
           containerStyle={{
             backgroundColor: "transparent",
           }}
-          cards={profile}
+          cards={profiles}
           stackSize={5}
           cardIndex={0}
           animateCardOpacity
           verticalSwipe={false}
-          onSwipedLeft={() => console.log("Swipe Pass")}
-          onSwipedRight={() => console.log("Swipe Match")}
+          onSwipedLeft={(cardIndex) => swipeLeft(cardIndex)}
+          onSwipedRight={(cardIndex) => swipeRight(cardIndex)}
           backgroundColor={"#4FD0E9"}
           overlayLabels={{
             left: {
@@ -54,9 +56,10 @@ export default function Card({ swipeRef, profile }) {
                 >
                   <View>
                     <Text className="text-xl font-bold">
-                      {card.firstName} {card.lastName}
+                      {/* {card.firstName} {card.lastName} */}
+                      {card.displayName}
                     </Text>
-                    <Text>{card.occupation}</Text>
+                    <Text>{card.job}</Text>
                   </View>
                   <Text className="text-2xl font-bold">{card.age}</Text>
                 </View>

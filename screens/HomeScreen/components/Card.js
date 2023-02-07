@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 import Swiper from "react-native-deck-swiper";
 import { DUMMY_DATA } from "../dummy_data";
 
-export default function Card({ swipeRef }) {
+export default function Card({ swipeRef, profile }) {
   return (
     <>
       <View className="flex-1 -mt-10">
@@ -12,7 +12,7 @@ export default function Card({ swipeRef }) {
           containerStyle={{
             backgroundColor: "transparent",
           }}
-          cards={DUMMY_DATA}
+          cards={profile}
           stackSize={5}
           cardIndex={0}
           animateCardOpacity
@@ -39,28 +39,40 @@ export default function Card({ swipeRef }) {
               },
             },
           }}
-          renderCard={(card) => (
-            <View key={card.id} className="bg-white h-3/4 rounded-3xl">
-              <Image
-                className="h-full w-full rounded-t-xl"
-                source={{
-                  uri: card.photoURL,
-                }}
-              />
-              <View
-                className="bg-white w-full h-20 flex flex-row justify-between 
+          renderCard={(card) =>
+            card ? (
+              <View key={card.id} className="bg-white h-3/4 rounded-3xl">
+                <Image
+                  className="h-full w-full rounded-t-xl"
+                  source={{
+                    uri: card.photoURL,
+                  }}
+                />
+                <View
+                  className="bg-white w-full h-20 flex flex-row justify-between 
             items-between px-6 py-2 rounded-b-md shadow-2xl"
-              >
-                <View>
-                  <Text className="text-xl font-bold">
-                    {card.firstName} {card.lastName}
-                  </Text>
-                  <Text>{card.occupation}</Text>
+                >
+                  <View>
+                    <Text className="text-xl font-bold">
+                      {card.firstName} {card.lastName}
+                    </Text>
+                    <Text>{card.occupation}</Text>
+                  </View>
+                  <Text className="text-2xl font-bold">{card.age}</Text>
                 </View>
-                <Text className="text-2xl font-bold">{card.age}</Text>
               </View>
-            </View>
-          )}
+            ) : (
+              <View className="relative bg-white h-3/4 rounded-xl justify-center items-center shadow-2xl">
+                <Text className="font-bold pb-5">No more profiles</Text>
+                <Image
+                  className="h-20 w-20"
+                  source={{
+                    uri: "https://links.papareact.com/6gb",
+                  }}
+                />
+              </View>
+            )
+          }
         />
       </View>
     </>

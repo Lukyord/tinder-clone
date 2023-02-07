@@ -1,5 +1,5 @@
 import { StatusBar } from "react-native";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuth from "../../hooks/useAuth";
 import Header from "./components/Header";
@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 //npx expo start --dev-client
 
 export default function HomeScreen() {
+  const [profile, setProfile] = useState([]);
   const { user } = useAuth();
   const swipeRef = useRef(null);
 
@@ -17,7 +18,7 @@ export default function HomeScreen() {
     <SafeAreaView className="flex-1">
       <StatusBar backgroundColor={"transparent"} translucent />
       <Header user={user} />
-      <Card swipeRef={swipeRef} />
+      <Card swipeRef={swipeRef} profile={profile} />
       <Footer swipeRef={swipeRef} />
     </SafeAreaView>
   );

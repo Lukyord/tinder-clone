@@ -2,6 +2,14 @@ import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
+import {
+  serverTimestamp,
+  doc,
+  setDoc,
+  addDoc,
+  collection,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 export default function ModalScreen() {
   const { user } = useAuth();
@@ -23,7 +31,41 @@ export default function ModalScreen() {
     });
   });
 
-  const updateUserProfile = () => {};
+  // setDoc(doc(db, "users", user.uid), {
+  //   id: user.uid,
+  //   displayName: user.displayName,
+  //   photoURL: image,
+  //   job: job,
+  //   age: age,
+  //   timestamp: serverTimestamp(),
+
+  async function updateUserProfile() {
+    try {
+      // const docRef = await addDoc(collection(db, "users"), {
+      //   id: user.uid,
+      //   displayName: user.displayName,
+      //   photoURL: image,
+      //   job: job,
+      //   age: age,
+      //   timestamp: serverTimestamp(),
+      // });
+
+      const docRef = await setDoc(doc(db, "users", user.uid), {
+        id: user.uid,
+        displayName: user.displayName,
+        photoURL: image,
+        job: job,
+        age: age,
+        timestamp: serverTimestamp(),
+      });
+
+      // console.log("Document written with ID: ", docRef.id);
+      console.log("Document written with ID: ", user.uid);
+      navigation.navigate("Home");
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
 
   return (
     <View className="relative flex-1 items-center pt-4">
@@ -43,7 +85,7 @@ export default function ModalScreen() {
       </Text>
       <TextInput
         value={image}
-        onChangeText={(text) => setImage(text)}
+        onChangeText={setImage}
         className="text-center text-xl pb-2"
         placeholder="Enter a Profile Pic URL"
       />
@@ -74,6 +116,7 @@ export default function ModalScreen() {
         className={`w-64 p-3 rounded-xl mt-52 ${
           incompleteForm ? "bg-gray-400" : "bg-red-400"
         }`}
+        onPress={updateUserProfile}
       >
         <Text className={`text-center text-white text-xl`}>Update Profile</Text>
       </TouchableOpacity>

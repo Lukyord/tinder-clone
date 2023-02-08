@@ -8,14 +8,17 @@ import Footer from "./components/Footer";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   query,
+  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigation } from "@react-navigation/native";
+import generateId from "../../lib/generateId";
 
 //eas build --profile development --platform android
 //npx expo start --dev-client
@@ -74,7 +77,7 @@ export default function HomeScreen() {
     return unsub;
   }, [db]);
 
-  const swipeLeft = (cardIndex) => {
+  const swipeLeft = async (cardIndex) => {
     if (!profiles[cardIndex]) return;
 
     const userSwiped = profiles[cardIndex];
@@ -83,16 +86,51 @@ export default function HomeScreen() {
     setDoc(doc(db, "users", user.uid, "passes", userSwiped.id), userSwiped);
   };
 
-  const swipeRight = (cardIndex) => {
+  const swipeRight = async (cardIndex) => {
     if (!profiles[cardIndex]) return;
 
     const userSwiped = profiles[cardIndex];
+    const loggedInProfile = await (
+      await getDoc(doc(db, "users", user.uid))
+    ).data();
 
-    console.log(
-      `You swiped MATCH on ${userSwiped.displayName} ${userSwiped.job}`
+    // Check if user swiped on you
+    getDoc(doc(db, "users", userSwiped.id, "swipes", user.uid)).then(
+      (documentSnapshot) => {
+        if (documentSnapshot.exists()) {
+          // user has matched with you before you matced with them
+          console.log(`Hooray you MATCHED with ${userSwiped.displayName}`);
+
+          setDoc(
+            doc(db, "users", user.uid, "swipes", userSwiped.id),
+            userSwiped
+          );
+          // Create a MATCH!
+          setDoc(doc(db, "matches", generateId(user.uid, userSwiped.id)), {
+            users: {
+              [user.uid]: loggedInProfile,
+              [userSwiped.id]: userSwiped,
+            },
+            usersMatched: [user.uid, userSwiped.id],
+            timestamp: serverTimestamp(),
+          });
+
+          navigation.navigate("Match", {
+            loggedInProfile,
+            userSwiped,
+          });
+        } else {
+          // user has swiped as first interaction between the two or didn't get swiped on...
+          console.log(
+            `You swiped MATCH on ${userSwiped.displayName} ${userSwiped.job}`
+          );
+          setDoc(
+            doc(db, "users", user.uid, "swipes", userSwiped.id),
+            userSwiped
+          );
+        }
+      }
     );
-
-    setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
   };
 
   return (

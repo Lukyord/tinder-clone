@@ -41,17 +41,21 @@ export default function HomeScreen() {
     let unsub;
 
     const fetchCards = async () => {
-      const passes = getDocs(collection(db, "users", user.uid, "passes")).then(
-        (snapshot) => snapshot.docs.map((doc) => doc.id)
-      );
+      const passes = await getDocs(
+        collection(db, "users", user.uid, "passes")
+      ).then((snapshot) => snapshot.docs.map((doc) => doc.id));
 
-      const passedUserIds =
-        (await passes).length > 0 ? passes : ["test", "eiei"];
+      const swipes = await getDocs(
+        collection(db, "users", user.uid, "swipes")
+      ).then((snapshot) => snapshot.docs.map((doc) => doc.id));
+
+      const passedUserIds = passes.length > 0 ? passes : ["test"];
+      const swipedUserIds = swipes.length > 0 ? swipes : ["test"];
 
       unsub = onSnapshot(
         query(
           collection(db, "users"),
-          where("id", "not-in", [...passedUserIds])
+          where("id", "not-in", [...passedUserIds, ...swipedUserIds])
         ),
         (snapshot) => {
           setProfiles(
@@ -68,9 +72,7 @@ export default function HomeScreen() {
 
     fetchCards();
     return unsub;
-  }, []);
-
-  console.log(profiles);
+  }, [db]);
 
   const swipeLeft = (cardIndex) => {
     if (!profiles[cardIndex]) return;
@@ -81,10 +83,16 @@ export default function HomeScreen() {
     setDoc(doc(db, "users", user.uid, "passes", userSwiped.id), userSwiped);
   };
 
-  const swipeRight = () => {
+  const swipeRight = (cardIndex) => {
     if (!profiles[cardIndex]) return;
 
     const userSwiped = profiles[cardIndex];
+
+    console.log(
+      `You swiped MATCH on ${userSwiped.displayName} ${userSwiped.job}`
+    );
+
+    setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
   };
 
   return (

@@ -14,7 +14,10 @@ export default function ChatRow({ matchDetails }) {
   }, [matchDetails, user]);
 
   return (
-    <TouchableOpacity className="flex-row items-center py-3 px-5 bg-white mx-3 my-1 rounded-lg shadow">
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Message", { matchDetails })}
+      className="flex-row items-center py-3 px-5 bg-white mx-3 my-1 rounded-lg shadow"
+    >
       <Image
         className="rounded-full h-16 w-16 mr-4"
         source={{

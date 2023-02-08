@@ -124,11 +124,8 @@ export default function HomeScreen() {
           console.log(
             `You swiped MATCH on ${userSwiped.displayName} ${userSwiped.job}`
           );
-          setDoc(
-            doc(db, "users", user.uid, "swipes", userSwiped.id),
-            userSwiped
-          );
         }
+        setDoc(doc(db, "users", user.uid, "swipes", userSwiped.id), userSwiped);
       }
     );
   };

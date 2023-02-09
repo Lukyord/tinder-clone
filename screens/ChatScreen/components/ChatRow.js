@@ -3,15 +3,30 @@ import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import useAuth from "../../../hooks/useAuth";
 import getMatchUserInfo from "../../../lib/getMatchUserInfo";
+import { db } from "../../../firebase";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 
 export default function ChatRow({ matchDetails }) {
   const navigation = useNavigation();
   const { user } = useAuth();
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
+  const [lastMessage, setLastMessage] = useState("");
 
   useEffect(() => {
     setMatchedUserInfo(getMatchUserInfo(matchDetails.users, user.uid));
   }, [matchDetails, user]);
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "matches", matchDetails.id, "messages"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot) => setLastMessage(snapshot.docs[0]?.data()?.message)
+      ),
+    [matchDetails, db]
+  );
 
   return (
     <TouchableOpacity
@@ -28,7 +43,7 @@ export default function ChatRow({ matchDetails }) {
         <Text className="text-lg font-semibold">
           {matchedUserInfo?.displayName}
         </Text>
-        <Text>Say Hi</Text>
+        <Text>{lastMessage || "Say Hi"}</Text>
       </View>
     </TouchableOpacity>
   );
